@@ -16,3 +16,16 @@ knitr::opts_chunk$set(echo = TRUE)
 - Mapping
 - Discussion
 
+<!-- This code is commented out -->
+<img src = "brain_art.jpg" class = "displayleft" alt = "My title"/>
+
+```{r eval = F, echo = F}
+<img src = "brain_art.jpg" class = "displayleft" alt = "My title"/>
+```
+
+
+```{r graphics, fig.align = 'center', echo = F}
+knitr::include_graphics("brain_art.jpg")
+```
+
+
