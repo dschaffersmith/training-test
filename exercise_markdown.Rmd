@@ -1,0 +1,49 @@
+---
+title: "Impacts of repeated flooding on socioeconomically vulnerable populations"
+author: "Danica Schaffer-Smith"
+date: "11/4/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Hurricane Matthew (2016) and Hurricane Florence (2018) both affected the 
+State of North Carolina. Yet, we still do not fully understand the scope of the impacts. We mapped flooding from these hurricanes using [Sentinel-1 SAR data](https://sentinel.esa.int/web/sentinel/missions/sentinel-1) and then assessed the proportion of each census tract that was repeatedly affected. The [CDC's Social Vulnerability Index](https://svi.cdc.gov) was used to examine impacts of flooding on socioeconomically vulnerable populations. 
+
+```{r, results = 'hide', echo = F}
+library(tidyr)
+## Read in the dataset
+tracts <- read.csv('flooding_tracts_20190829.csv', stringsAsFactors = F)
+```
+
+## Analysis
+
+We assessed the relationship between flooding and a variety of indicators of social vulnerability using linear models. For example, we examined whether there was a significant relationship between the number of adults age 65 or older in a census tract and the proportion of repeated flooding in each tract. 
+
+```{r, results = 'hide', echo = F}
+# Assess the relationship between flood hazard and age > 65 at the census tract level with a linear model
+lm1 <- lm(tracts$E_AGE65~tracts$pRepeatFlood)
+```
+
+
+## Results
+
+```{r, results = 'hide', echo = F}
+summary(tracts$pRepeatFlood)
+meanFlood <- mean(tracts$pRepeatFlood)
+```
+
+The average repeat flooding in census tracts in our study area was `r meanFlood`.
+
+These plots show the results of the linear model examining the relationship between repeated flooding in census tracts and the proportion of residents that are age 65 or older according to the 2016 CDC SVI dataset. 
+
+```{r}
+#plot(tracts$pMatt, tracts$E_AGE65)
+#plot(tracts$pFlo, tracts$E_AGE65)
+plot(lm1)
+```
+
