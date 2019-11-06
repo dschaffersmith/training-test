@@ -24,7 +24,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r graphics, fig.align = 'center', echo = F}
+```{r graphics, fig.align = 'center', echo = F, out.width="75%"}
+# This is much more flexible than the above. 
+# The html above would need to pull a pre-size image or use a separate
+# html style sheet. 
 knitr::include_graphics("brain_art.jpg")
 ```
 

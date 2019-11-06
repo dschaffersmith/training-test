@@ -1,0 +1,72 @@
+---
+title: "Data Tidying"
+author: "Danica Schaffer-Smith"
+date: "11/6/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load pkgs, warning=F, message=F}
+library(dplyr)
+library(tidyr)
+```
+
+# Read and Clean data
+
+```{r}
+catch_original <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1", 
+                               method = "libcurl"),
+                    stringsAsFactors = FALSE)
+head(catch_original)
+```
+
+Remove `all` column and `notes` column because we don't need them.
+```{r}
+catch_data <- catch_original %>% 
+  select(-All, -notesRegCode)
+  #select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum)
+```
+
+Quick QA check:
+```{r}
+summary(catch_data) # Chinook is a character!  Why!?
+```
+
+## Fix Chinook column
+
+Use `mutate` to fix Chinook column. First, overwrite a bad value that was read in as "I" instead of 1 by OCR. 
+```{r}
+catch_clean <- catch_data %>% 
+  mutate(Chinook = ifelse(Chinook == "I", 1, Chinook)) %>% 
+  mutate(Chinook = as.numeric(Chinook))
+
+summary(catch_clean)
+```
+
+Finding the rows that got turned into NA.
+```{r}
+i <- which(is.na(catch_clean$Chinook))
+i
+```
+
+```{r}
+catch_original[i, ] # Look at that record [rows, columns]
+```
+
+
+# Reshape Data
+
+```{r}
+catch_long <- catch_clean %>% 
+  pivot_longer(cols = -c(Region, Year),
+               names_to = "species",
+               values_to = "count")
+head(catch_long)
+```
+
+# Summarize Data
+
+# Join Data 
