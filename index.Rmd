@@ -23,9 +23,13 @@ knitr::opts_chunk$set(echo = TRUE)
 <img src = "brain_art.jpg" class = "displayleft" alt = "My title"/>
 ```
 
+# Rosie changed Danica's index file
 
+Danica is super awesome. Here is a present for her:
 ```{r graphics, fig.align = 'center', echo = F}
-knitr::include_graphics("brain_art.jpg")
+knitr::include_graphics("https://sayingimages.com/wp-content/uploads/you-have-kitten-memes.jpg")
 ```
+
+
 
 
