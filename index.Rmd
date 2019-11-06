@@ -17,15 +17,15 @@ knitr::opts_chunk$set(echo = TRUE)
 - Discussion
 
 <!-- This code is commented out -->
-<img src = "brain_art.jpg" class = "displayleft" alt = "My title"/>
 
-```{r eval = F, echo = F}
-<img src = "brain_art.jpg" class = "displayleft" alt = "My title"/>
-```
+## Pictures of kittens
 
-# Rosie changed Danica's index file
+One kitten:
 
-Danica is super awesome. Here is a present for her:
+<img src = "https://imgflip.com/s/meme/Cute-Cat.jpg" class = "displayleft" alt = "a cute kitten"/>
+
+
+Another kitten:
 ```{r graphics, fig.align = 'center', echo = F}
 knitr::include_graphics("https://sayingimages.com/wp-content/uploads/you-have-kitten-memes.jpg")
 ```
