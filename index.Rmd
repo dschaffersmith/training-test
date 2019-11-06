@@ -17,11 +17,12 @@ knitr::opts_chunk$set(echo = TRUE)
 - Discussion
 
 <!-- This code is commented out -->
-<img src = "brain_art.jpg" class = "displayleft" alt = "My title"/>
 
-```{r eval = F, echo = F}
-<img src = "brain_art.jpg" class = "displayleft" alt = "My title"/>
-```
+## Pictures of kittens
+
+One kitten:
+
+<img src = "https://imgflip.com/s/meme/Cute-Cat.jpg" class = "displayleft" alt = "a cute kitten"/>
 
 
 ```{r graphics, fig.align = 'center', echo = F, out.width="75%"}
@@ -30,5 +31,12 @@ knitr::opts_chunk$set(echo = TRUE)
 # html style sheet. 
 knitr::include_graphics("brain_art.jpg")
 ```
+
+#Another kitten:
+```{r graphics, fig.align = 'center', echo = F}
+knitr::include_graphics("https://sayingimages.com/wp-content/uploads/you-have-kitten-memes.jpg")
+```
+
+
 
 
