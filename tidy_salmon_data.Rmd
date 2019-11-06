@@ -56,7 +56,6 @@ i
 catch_original[i, ] # Look at that record [rows, columns]
 ```
 
-
 # Reshape Data
 
 ```{r}
@@ -67,6 +66,112 @@ catch_long <- catch_clean %>%
 head(catch_long)
 ```
 
+```{r}
+catch_wide <- catch_long %>% 
+  pivot_wider(names_from = Year,
+              values_from = count)
+head(catch_wide)
+```
+`rename` count column to `catch_thousands`
+
+```{r}
+catch_long <- catch_long %>% 
+  rename(catch_thousands = count) %>% 
+  mutate(catch = catch_thousands * 1000) %>% 
+  select(-catch_thousands)
+
+head(catch_long)
+```
+
+
 # Summarize Data
 
+Use group by and summarize to create a summary table for our dataset. 
+```{r}
+mean_region <- catch_long %>% 
+  group_by(Region, species) %>% 
+  summarize(catch_mean = mean(catch),
+            num_obs = n())
+
+mean_region
+```
+
+Calculate the total catch by species. Which is the most commonly caught across all years and regions?
+
+```{r}
+sum_long <- catch_long %>% 
+  group_by(species) %>% 
+  summarize(catch_sum = sum(catch)) %>%
+  arrange(-catch_sum)
+  #arrange(desc(catch_sum))
+sum_long
+```
+
+Filter to examine years pre-1900. The most dominant species was Sockeye!
+```{r}
+sum_pre1900 <- catch_long %>% 
+  filter(Year<1900) %>% 
+  group_by(species) %>% 
+  summarise(total = sum(catch)) %>% 
+  arrange(desc(total))
+sum_pre1900
+```
+
+
 # Join Data 
+
+We can use joins to bring multiple tables together. We have a regions dataframe for the salmon catch data that can help us to better describe regions. We want to keep all of our observations.
+
+First, read in the regions dataset
+
+```{r}
+region_defs <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", method = "libcurl"), stringsAsFactors = F) %>% 
+  select(code, mgmtArea) %>% 
+  rename(Region = code)
+
+head(region_defs)
+```
+
+Join the dataframes together
+```{r}
+#catch_joined <- left_join(catch_long, region_defs, by = c("Region"="code"))
+
+catch_joined <- left_join(catch_long, region_defs, by = "Region")
+
+head(catch_joined)
+```
+
+# Separate and Unite
+
+```{r}
+# This is a made up example. The samples were observed with Islands (first three letters) and site number
+site_codes <- data.frame(site = c("HAW-100",
+                                  "HAW-101",
+                                  "OAH-102",
+                                  "OAH-103",
+                                  "MAI-100"),
+                         stringsAsFactors = F)
+site_codes
+```
+
+Separate island from site number using `separate`
+
+```{r}
+site_codes_split <- site_codes %>% 
+  #separate(site, into = c("island", "site_num"), sep = "-")
+  separate(site, into = c("island", "site_num"), sep = "-", remove = F)
+site_codes_split
+```
+
+Reunited and it feels so good.
+
+```{r}
+united <- site_codes_split %>% 
+  unite(site_code, island, site_num, sep = "_") #name of the new column, name of 1st variable, name of 2nd variable, separator. 
+
+united
+```
+
+Always knit your document to make sure it runs!
+
+You probably want to clean it up a bit and provide some more information for other users. 
