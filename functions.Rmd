@@ -1,0 +1,66 @@
+---
+title: "functions"
+author: "Danica Schaffer-Smith"
+date: "11/6/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(roxygen2)
+```
+
+```{r}
+airtemps = c(212, 30, 78, 32)
+#celsius <- (airtemps[1]-32)*5/9
+celsius1 <- (airtemps[1]-32)*5/9
+celsius2 <- (airtemps[2]-32)*5/9
+celsius3 <- (airtemps[3]-32)*5/9
+celsius4 <- (airtemps[4]-32)*5/9
+
+celsius
+```
+
+#Create a function to convert fahrenheight to celsius
+```{r}
+fahr2censius <- function(fahr) {
+  celsius <- (fahr-32)*5/9
+  return(celsius)
+}
+```
+
+#Use our function
+```{r}
+celsius_f <- fahr2censius(airtemps[1])
+
+celsius_f
+celsius_f==celsius1
+
+celsius <- fahr2censius(airtemps)
+celsius[4]==celsius4
+```
+
+Write a function that calculates fahrenheight from celsius. Run it on the previous results and ensure that the result is equivalent to airtemps. 
+
+```{r}
+#' Converts celsius to fahrenheit temperatures
+#'
+#' A little needed but more detailed explanation
+#' goes here. 
+#' @param celsius is the tempreature in degrees celsius to be converted. #' return the temperature in fahrenheit
+cel2fahr <- function(cel){
+  fahr <- (cel*(9/5)+32)
+  return(fahr)
+}
+```
+
+```{r}
+temp_fahr <- cel2fahr(celsius)
+
+temp_fahr
+temp_fahr == airtemps
+```
+
