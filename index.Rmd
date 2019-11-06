@@ -17,11 +17,11 @@ knitr::opts_chunk$set(echo = TRUE)
 - Discussion
 
 <!-- This code is commented out -->
-<img src = "brain_art.jpg" class = "displayleft" alt = "My title"/>
 
-```{r eval = F, echo = F}
-<img src = "brain_art.jpg" class = "displayleft" alt = "My title"/>
-```
+Let's just add another kitten
+
+<img src = "https://imgflip.com/s/meme/Cute-Cat.jpg" class = "displayleft" alt = "My title"/>
+
 
 # Rosie changed Danica's index file
 
