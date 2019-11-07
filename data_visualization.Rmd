@@ -1,0 +1,174 @@
+---
+title: "Data Visualization"
+author: "Danica Schaffer-Smith"
+date: "11/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load packages
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(leaflet)
+library(scales)
+library(DT)
+```
+
+# Prepare data
+
+```{r}
+# It would actually be faster to read in the data from the local file.
+# This code looks for the file on disk, downloads if it doesn't find it.
+# Download it to the correct directory. 
+data_url <- "https://knb.ecoinformatics.org/knb/d1/mn/v2/object/urn%3Auuid%3Af119a05b-bbe7-4aea-93c6-85434dcb1c5e"
+
+esc <- tryCatch(
+    read.csv("data/escapement.csv", stringsAsFactors = FALSE),
+    error=function(cond) {
+        message(paste("Escapement file does not seem to exist, so get it from the KNB."))
+        esc <- read.csv(url(data_url, method = "libcurl"), stringsAsFactors = FALSE)
+        write.csv(esc, "escape_data/escapement.csv", row.names = F)
+        return(esc)
+    }
+)
+
+head(esc)
+```
+
+
+# Dplyr practice
+# Calculate total escapement by species, region, year
+# Only for Sockeye, Chinook, Coho, Pink, Chum
+
+```{r}
+# Fix the date
+#esc$Year <- format(as.Date(esc$sampleDate, format="%Y-%m-%d"),"%Y")
+
+# Create a list of the species we want to keeep
+species2keep <- c("Sockeye", "Chinook", "Coho", "Pink", "Chum")
+
+# Summarize the data
+esc_sum <- esc %>%
+  filter(Species %in% species2keep) %>% 
+  mutate(Year = format(as.Date(sampleDate, format="%Y-%m-%d"),"%Y")) %>%
+  group_by(Species, SASAP.Region, Year) %>% 
+  summarize(total = sum(DailyCount))
+
+esc_sum
+
+# Jeanette's solution
+annual_esc <- esc %>% 
+  separate(sampleDate, into = c("Year", "Month", "Day"), sep = "-") %>% 
+  mutate(Year = as.numeric(Year)) %>% 
+  # mutate(Year = lubridate::year(as.Date(sampleDate)))
+  filter(Species %in% c("Sockeye", "Chinook", "Coho", "Pink", "Chum")) %>% 
+  group_by(Species, SASAP.Region, Year) %>% 
+  summarize(total = sum(DailyCount))
+```
+
+
+# Create Static Plots
+
+```{r}
+# Simple column plot
+ggplot(esc_sum, mapping=aes(x=Species, y = total)) +
+  geom_col(fill="blue")
+```
+
+```{r}
+# Color code regions
+ggplot(esc_sum, mapping=aes(x=Species, y = total, fill=SASAP.Region)) +
+  geom_col()
+```
+
+```{r}
+# Just Kodiak region
+kodiak_esc <- annual_esc %>%
+  filter(SASAP.Region == "Kodiak")
+
+# Call themes you use frequently from source or save as a function in a package
+my_theme <- theme_bw() + 
+  theme(legend.position = "bottom")
+
+pal<- c("blue", "green", "pink", "gray", "orange")
+
+ggplot(kodiak_esc, mapping = aes(x=Year, y=total, color=Species)) +
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(labels = comma) + # comma is a function from the scales pkg
+  #scale_y_continuous(labels = percent) + 
+  #scale_color_manual(values = pal)+
+  ylab("Escapement (number of fish)") +
+  ggtitle("Kodiak salmon escapement") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+#esc_sum %>% 
+#  filter(SASAP.Region == "Kodiak") %>% 
+#  ggplot(mapping = aes(x=Year, y=total, color=Species))+
+#  geom_line()+
+#  geom_point()
+```
+
+```{r, fig.height=7, fig.height=4}
+p1 <- ggplot(annual_esc, mapping = aes(x=Year, y=total, color=Species)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~SASAP.Region, ncol = 2, scales = "free_y")+
+  scale_y_continuous(labels = comma) + # comma is a function from the scales pkg
+  ylab("Escapement (number of fish)") +
+  ggtitle("Kodiak salmon escapement") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+ggsave("figure.png", p1, height = 7, width = 7, units = "in", dpi = 300) # Prints the last plot you created. allows you to change height and width on disk. 
+```
+
+# Create an Interactive Table
+
+```{r}
+locations <- esc %>% 
+  distinct(Location, Latitude, Longitude) %>% 
+  drop_na()
+
+locations
+```
+
+```{r}
+datatable(locations) # Creates an interactive sortable table in knitted doc!!!
+```
+
+## Create an Interactive Map
+
+```{r}
+leaflet(locations) %>% 
+  addTiles() %>% 
+  addMarkers(lng = ~Longitude, lat = ~Latitude, popup = ~Location)
+```
+
+```{r}
+# Add custom tiled data from satellite imagery
+leaflet(locations) %>% 
+  addWMSTiles("https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?",
+              layers = 'GEBCO_LATEST',
+              attribution = "Imagery reproduced from the GEBCO_2014 Grid, version 20150318, www.gebco.net") %>%
+  addCircleMarkers(lng = ~Longitude,
+                   lat = ~Latitude,
+                   popup = ~ Location,
+                   radius = 5,
+                   # set fill properties
+                   fillColor = "salmon",
+                   fillOpacity = 1,
+                   # set stroke properties
+                   stroke = T,
+                   weight = 0.5,
+                   color = "white",
+                   opacity = 1)
+```
+
