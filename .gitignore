@@ -37,3 +37,6 @@ rsconnect/
 
 # data folder
 data/
+
+# escape data folder
+escape_data/
