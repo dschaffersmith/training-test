@@ -40,3 +40,6 @@ data/
 
 # escape data folder
 escape_data/
+
+# shapefiles
+shapefiles/
